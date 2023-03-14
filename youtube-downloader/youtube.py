@@ -1,6 +1,5 @@
 import pytube
 from tkinter import filedialog, Tk
-import os
 
 link = input("Enter the YouTube link: ")
 
