@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "YouTube Downloader",
+  "version": "1.0",
+  "description": "A Chrome extension that downloads YouTube videos and audio",
+  "permissions": [
+    "activeTab",
+    "downloads"
+  ],
+  "browser_action": {
+    "default_title": "Download YouTube Video",
+    "default_popup": "popup.html"
+  }
+}
