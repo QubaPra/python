@@ -1,6 +1,39 @@
 import pytube
 from tkinter import filedialog, Tk
 import os
+import time
+import math
+import sys
+
+def progress_callback(stream, chunk, bytes_remaining):
+    # Get the total file size in bytes
+    total_size = stream.filesize
+    
+    # Calculate the bytes downloaded so far
+    bytes_downloaded = total_size - bytes_remaining
+    
+    # Calculate the percentage of download
+    percent = (bytes_downloaded / total_size) * 100.0
+    
+    # Calculate the download speed in bytes per second
+    download_speed = (bytes_downloaded / (time.time() - start_time))
+    
+    # Calculate the estimated time remaining in seconds
+    time_remaining = bytes_remaining / download_speed
+    
+    # Convert to minutes and seconds
+    minutes, seconds = divmod(time_remaining, 60)
+    
+    # Calculate the size of the file in megabytes
+    file_size_mb = total_size / (1024 * 1024)
+    
+    # Calculate the number of megabytes downloaded
+    downloaded_mb = bytes_downloaded / (1024 * 1024)
+    
+    # Print the progress bar
+    sys.stdout.write('\r')
+    sys.stdout.write("[%-20s] %d%%  %.2fMB/%.2fMB  %.2fMB/s  ETA: %d:%02d" % ('='*int(20*percent/100), percent, downloaded_mb, file_size_mb, download_speed/(1024*1024), minutes, seconds))
+    sys.stdout.flush()
 
 link = input("Enter the YouTube link: ")
 
@@ -35,11 +68,22 @@ root = Tk()
 root.withdraw()
 download_location = filedialog.askdirectory(title="Choose download location")
 
-# Download the selected audio or video stream
+if download_type == "a":
+    start_time = time.time()
+    # Download the selected audio stream
+    audio.download(download_location, filename=audio.default_filename.split('.')[0] + ' audio'+ audio.default_filename[audio.default_filename.rfind("."):], 
+                   on_progress_callback=progress_callback)
+else:
+    start_time = time.time()
+    # Download the selected video stream
+    stream.download(download_location, 
+                    filename=stream.default_filename.split('.')[0] + ' video'+ stream.default_filename[stream.default_filename.rfind("."):],
+                    on_progress_callback=progress_callback)
 
-audio.download(download_location, filename=audio.default_filename.split('.')[0] + ' audio'+ audio.default_filename[audio.default_filename.rfind("."):])
+# Print the final progress bar with 100% completion
+sys.stdout.write('\r')
+sys.stdout.write("[%-20s] %d%%  %.2fMB/%.2fMB  %.2fMB/s  ETA: 00:00" % ('='*20, 100, file_size_mb, file_size_mb, 0))
+sys.stdout.flush()
 
-if (download_type == "v"):
-    stream.download(download_location)
+print("\nDownload complete.")
 
-print("Download complete.")
