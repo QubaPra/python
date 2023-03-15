@@ -6,6 +6,10 @@ from pieces import ChessPieces
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+selected_piece = None
+selected_piece_pos = None
+
+
 # Initialize Pygame
 pygame.init()
 
@@ -32,12 +36,29 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            row, col = mouse_pos[1] // 60, mouse_pos[0] // 60
+            piece = board.board[row][col]
+            if piece:
+                    selected_piece = piece
+                    selected_piece_pos = (row, col)
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if selected_piece:
+                mouse_pos = pygame.mouse.get_pos()
+                row, col = mouse_pos[1] // 60, mouse_pos[0] // 60
+                if board.is_valid_move(selected_piece_pos, (row, col)):
+                    board.move_piece(selected_piece_pos, (row, col))
+                selected_piece = None
+                selected_piece_pos = None
     
     # Draw the board and pieces
     board.draw()
-    pieces.draw(screen)
+    pieces.draw(screen, selected_piece_pos)
 
     # Update the display
     pygame.display.update()
+
+    #board.put_piece(("white", "queen"), 1, 4)
 
     clock.tick(60)

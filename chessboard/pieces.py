@@ -20,12 +20,19 @@ class ChessPieces:
             "black_king": pygame.image.load("black_king.png")
         }
 
-    def draw(self, screen):
+    def draw(self, screen, selected_piece_pos):
         self.screen = screen
         for i in range(8):
             for j in range(8):
                 piece = self.board.board[i][j]
                 if piece:
                     color, p_type = piece
-                    self.screen.blit(self.images[color + "_" + p_type], (j * 60, i * 60))
+                    img = self.images[color + "_" + p_type]
+                    pos = (j * 60, i * 60)
+                    if (i, j) == selected_piece_pos:
+                        img.set_alpha(128) # make the image semi-transparent
+                    else:
+                        img.set_alpha(255)
+                    self.screen.blit(img, pos)
+
 
