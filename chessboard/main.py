@@ -2,13 +2,13 @@ import pygame
 from board import ChessBoard
 from pieces import ChessPieces
 
+
 # Define constants for the colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 selected_piece = None
 selected_piece_pos = None
-
 
 # Initialize Pygame
 pygame.init()
@@ -50,8 +50,8 @@ while True:
                 mouse_pos = pygame.mouse.get_pos()
                 row, col = mouse_pos[1] // 60, mouse_pos[0] // 60
                 if board.is_valid_move(selected_piece_pos, (row, col), "white" if white_turn else "black"):
-                    board.move_piece(selected_piece_pos, (row, col), "white" if white_turn else "black")
-                    white_turn = not white_turn
+                    if not (board.move_piece(selected_piece_pos, (row, col), "white" if white_turn else "black")):
+                        white_turn = not white_turn                 
                 selected_piece = None
                 selected_piece_pos = None
     
