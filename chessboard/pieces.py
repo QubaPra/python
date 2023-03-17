@@ -25,14 +25,20 @@ class ChessPieces:
         for i in range(8):
             for j in range(8):
                 piece = self.board.board[i][j]
-                if piece:
+                if piece and (i, j) != selected_piece_pos:
                     color, p_type = piece
                     img = self.images[color + "_" + p_type]
                     pos = (j * 60, i * 60)
-                    if (i, j) == selected_piece_pos:
-                        img.set_alpha(128) # make the image semi-transparent
-                    else:
-                        img.set_alpha(255)
                     self.screen.blit(img, pos)
 
-
+        # Draw the selected piece last
+        if selected_piece_pos:
+            i, j = selected_piece_pos
+            piece = self.board.board[i][j]
+            if piece:
+                color, p_type = piece
+                img = self.images[color + "_" + p_type]
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_x, mouse_y = mouse_pos
+                pos = (mouse_x - 60 / 2, mouse_y - 60 / 2)
+                self.screen.blit(img, pos)
