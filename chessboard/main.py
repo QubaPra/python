@@ -46,6 +46,9 @@ while not game_over:
         elif board.is_checkmate("white"):                     
             winner = "Black"
             game_over = True
+        elif board.is_stalemate("white") or board.is_stalemate("black"):                     
+            winner = "Stalemate"
+            game_over = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             row, col = mouse_pos[1] // 60, mouse_pos[0] // 60
@@ -86,19 +89,29 @@ while game_over:
 
     # Display winner
     font = pygame.font.SysFont('Impact', 100)
-    text = font.render(f"{winner} won!", True, winner)
-    text_rect = text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
-    
-    
-    
+    if winner == "Stalemate":
+        text = font.render(f"{winner}", True, (128,128,128))
+        text_rect = text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
 
-    # Create a surface for the stroke
-    stroke = pygame.Surface((600, 110))
-    stroke2 = pygame.Surface((600, 120))
+        # Create a surface for the stroke
+        stroke = pygame.Surface((600, 110))
+        stroke2 = pygame.Surface((600, 120))
 
-    # Fill the stroke with the stroke color
-    stroke.fill("black" if winner == "White" else "white")
-    stroke2.fill(winner)
+        # Fill the stroke with the stroke color
+        stroke.fill((200,200,200))
+        stroke2.fill((128,128,128))        
+    else:
+        text = font.render(f"{winner} won!", True, winner)
+        text_rect = text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+
+        # Create a surface for the stroke
+        stroke = pygame.Surface((600, 110))
+        stroke2 = pygame.Surface((600, 120))
+
+        # Fill the stroke with the stroke color
+        stroke.fill("black" if winner == "White" else "white")
+        stroke2.fill(winner)
+        
     screen.blit(stroke2, stroke2.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2)))
     screen.blit(stroke, stroke.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2)))
     screen.blit(text, text_rect)
@@ -107,5 +120,3 @@ while game_over:
     pygame.display.update()
 
     clock.tick(60)
-
-
