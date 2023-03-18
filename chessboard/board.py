@@ -6,6 +6,10 @@ WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
 
 check = False
+castle = {"white": False, "black": False}
+qcastle = {"white": False, "black": False}
+kcastle = {"white": False, "black": False}
+
 
 class ChessBoard:
     def __init__(self, width=480, height=480, square_size=60):
@@ -20,18 +24,18 @@ class ChessBoard:
         for row in range(8):
             for col in range(8):
                 color = self.board_color if (row + col) % 2 == 0 else self.background_color
-                pygame.draw.rect(self.screen, color, [col * self.square_size, row * self.square_size, self.square_size, self.square_size])   
+                pygame.draw.rect(self.screen, color, [col * self.square_size, row * self.square_size, self.square_size, self.square_size])
     
     def is_valid_move(self, start_pos, end_pos, color):
-        global check
+        global check, castle, qcastle, kcastle
         start_row, start_col = start_pos
         end_row, end_col = end_pos
         if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
             return False
         piece = self.board[start_row][start_col]
         if not piece or piece[0] != color:
-            return False
-        p_type = piece[1]               
+            return False        
+        p_type = piece[1]
 
         if p_type == "pawn":
             if start_col == end_col:
@@ -84,7 +88,27 @@ class ChessBoard:
                         return False
                 return not self.board[end_row][end_col] or self.board[end_row][end_col][0] != color
         
-        elif p_type == "king":
+        elif p_type == "king":            
+            if not castle[color]:           
+                if color == "white":
+                    if (not kcastle[color] and end_pos == (7,6)) or (not qcastle[color] and end_pos==(7,2)):
+                        for i in range(1, 3):
+                            col = start_col + (1 if end_col > start_col else -1) * i
+                            if self.board[start_row][col] or self.check_square(7,col-1, "black"):
+                                return False
+                        if self.check_square(7,start_col + (1 if end_col > start_col else -1) * 3, "black"):
+                            return False
+                        return True
+                elif color == "black":
+                    if (not kcastle[color] and end_pos == (0,6)) or (not qcastle[color] and end_pos==(0,2)):
+                        for i in range(1, 3):
+                            col = start_col + (1 if end_col > start_col else -1) * i
+                            if self.board[start_row][col] or self.check_square(0,col, "white"):
+                                return False                            
+                        if self.check_square(0,start_col + (1 if end_col > start_col else -1) * 3, "white"):
+                            return False
+                        return True
+                
             return abs(end_col - start_col) <= 1 and abs(end_row - start_row) <= 1 and (not self.board[end_row][end_col] or self.board[end_row][end_col][0] != color)
         
         elif p_type == "knight":
@@ -122,9 +146,9 @@ class ChessBoard:
         return False
 
     def move_piece(self, selected_piece_pos, dest_pos,color):
-        
-        if self.is_valid_move(selected_piece_pos, dest_pos,color):          
-
+        global castle, qcastle, kcastle           
+                
+        if self.is_valid_move(selected_piece_pos, dest_pos,color):                        
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
             piece = self.board[selected_piece_pos[0]][selected_piece_pos[1]]         
             self.board[selected_piece_pos[0]][selected_piece_pos[1]] = None
@@ -134,10 +158,42 @@ class ChessBoard:
                 
                 self.board[selected_piece_pos[0]][selected_piece_pos[1]] = piece
                 self.board[dest_pos[0]][dest_pos[1]] = prev_piece                
-                return True        
+                return True
 
             # Check for pawn promotion
             if piece[1] == "pawn" and (dest_pos[0] == 0 or dest_pos[0] == 7):
-                self.board[dest_pos[0]][dest_pos[1]] = (color, "queen")                      
+                self.board[dest_pos[0]][dest_pos[1]] = (color, "queen")
+            
+            # Ceck for castle       
+            if piece[1] == "king" and abs(dest_pos[1]-selected_piece_pos[1]) == 2:                
+                if dest_pos == (7,6) or dest_pos == (0,6):
+                    self.board[dest_pos[0]][dest_pos[1]-1] = (color, "rook")
+                    self.board[dest_pos[0]][7] = None
+                elif dest_pos == (7,2) or dest_pos == (0,2):
+                    self.board[dest_pos[0]][dest_pos[1]+1] = (color, "rook")
+                    self.board[dest_pos[0]][0] = None
+
+            if piece[1] == "king":
+                castle[color]= True
+            if piece[1] == "rook":                
+                if self.board[7][7] == None:
+                    kcastle[color]=True
+                elif self.board[7][0] == None:
+                    qcastle[color]=True
+                elif self.board[0][7] == None:
+                    kcastle[color]=True
+                elif self.board[0][0] == None:
+                    qcastle[color]=True
         
+        return False
+    
+    def check_square(self,row, col, color):
+
+        for r in range(8):
+            for c in range(8):
+                piece = self.board[r][c]
+                if piece and piece[0] == color:
+                    # Check if the piece can move to the square
+                    if self.is_valid_move((r, c), (row, col), piece[0]):
+                        return True
         return False
