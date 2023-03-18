@@ -9,6 +9,8 @@ check = False
 castle = {"white": False, "black": False}
 qcastle = {"white": False, "black": False}
 kcastle = {"white": False, "black": False}
+en_passant_target = None
+passant = True
 
 
 class ChessBoard:
@@ -27,7 +29,7 @@ class ChessBoard:
                 pygame.draw.rect(self.screen, color, [col * self.square_size, row * self.square_size, self.square_size, self.square_size])
     
     def is_valid_move(self, start_pos, end_pos, color):
-        global check, castle, qcastle, kcastle
+        global check, castle, qcastle, kcastle, en_passant_target, passant
         start_row, start_col = start_pos
         end_row, end_col = end_pos
         if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
@@ -39,17 +41,30 @@ class ChessBoard:
 
         if p_type == "pawn":
             if start_col == end_col:
-                if color == "white" and end_row == start_row - 1 and not self.board[end_row][end_col]:
-                    return True
-                elif color == "white" and start_row == 6 and end_row == start_row - 2 and not self.board[end_row][end_col] and not self.board[end_row + 1][end_col]:
-                    return True
-                elif color == "black" and end_row == start_row + 1 and not self.board[end_row][end_col]:
-                    return True
-                elif color == "black" and start_row == 1 and end_row == start_row + 2 and not self.board[end_row][end_col] and not self.board[end_row - 1][end_col]:
-                    return True
+                if color == "white":
+                    if end_row == start_row - 1 and not self.board[end_row][end_col]:
+                        return True
+                    elif start_row == 6 and end_row == start_row - 2 and not self.board[end_row][end_col] and not self.board[end_row + 1][end_col]:
+                        en_passant_target = (end_row, end_col)
+                        passant = True
+                        #print(en_passant_target)
+                        return True
+                elif color == "black":
+                    if end_row == start_row + 1 and not self.board[end_row][end_col]:
+                        return True
+                    elif start_row == 1 and end_row == start_row + 2 and not self.board[end_row][end_col] and not self.board[end_row - 1][end_col]:
+                        en_passant_target = (end_row, end_col)
+                        passant = True
+                        #print(en_passant_target)
+                        return True
             elif abs(end_col - start_col) == 1 and end_row == start_row + (-1 if color == "white" else 1):
                 target_piece = self.board[end_row][end_col]
                 if target_piece and target_piece[0] != color:
+                    return True
+                # Check for en passant capture
+                
+                elif (end_row + (1 if color == "white" else -1), end_col )== en_passant_target:
+                    self.board[en_passant_target[0]][en_passant_target[1]] = None
                     return True
 
         elif p_type == "rook":
@@ -146,7 +161,7 @@ class ChessBoard:
         return False
 
     def move_piece(self, selected_piece_pos, dest_pos,color):
-        global castle, qcastle, kcastle           
+        global castle, qcastle, kcastle, passant, en_passant_target           
                 
         if self.is_valid_move(selected_piece_pos, dest_pos,color):                        
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
@@ -157,8 +172,21 @@ class ChessBoard:
             if self.check_check(color):                
                 
                 self.board[selected_piece_pos[0]][selected_piece_pos[1]] = piece
-                self.board[dest_pos[0]][dest_pos[1]] = prev_piece                
+                self.board[dest_pos[0]][dest_pos[1]] = prev_piece
+                if en_passant_target!=None and not passant:
+                    self.board[en_passant_target[0]][en_passant_target[1]] = ("black" if color == "white" else "white", "pawn")                              
                 return True
+            
+            if en_passant_target!=None and passant:
+                passant = False
+                
+            elif en_passant_target!=None and not passant:
+                passant = True                
+                en_passant_target=None           
+            
+            print (en_passant_target, passant)
+            
+
 
             # Check for pawn promotion
             if piece[1] == "pawn" and (dest_pos[0] == 0 or dest_pos[0] == 7):
