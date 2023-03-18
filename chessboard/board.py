@@ -1,5 +1,8 @@
 import pygame
 
+pygame.mixer.init()
+move_sound = pygame.mixer.Sound("./sounds/move.mp3")
+
 # Define constants for the colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -13,6 +16,8 @@ en_passant_target = None
 passant = True
 
 
+
+
 class ChessBoard:
     def __init__(self, width=480, height=480, square_size=60):
         self.board = [[0] * 8 for _ in range(8)]
@@ -21,11 +26,14 @@ class ChessBoard:
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.draw()
 
-    def draw(self):
-        self.screen.fill(self.background_color)
+    def draw(self):    
         for row in range(8):
             for col in range(8):
-                color = self.board_color if (row + col) % 2 == 0 else self.background_color
+                color = WHITE if (row + col) % 2 == 0 else GRAY
+                if self.check_check("white") and self.board[row][col] == ("white", "king"):
+                    color = (255, 0, 0)
+                elif self.check_check("black") and self.board[row][col] == ("black", "king"):
+                    color = (255, 0, 0)
                 pygame.draw.rect(self.screen, color, [col * self.square_size, row * self.square_size, self.square_size, self.square_size])
     
     def is_valid_move(self, start_pos, end_pos, color):
@@ -154,22 +162,76 @@ class ChessBoard:
             for col in range(8):
                 piece = self.board[row][col]
                 if piece and piece[0] != color and self.is_valid_move((row, col), (king_row, king_col), "black" if color == "white" else "white"):
-                    print("in check")
+                    #print("in check")
                     return True
             else:
                 continue
         return False
 
+    def is_checkmate(self, color):
+        # Find the king
+        
+        king_pos = None
+        for row in range(8):
+            for col in range(8):
+                if self.board[row][col] == (color, "king"):
+                    king_pos = (row, col)
+                    break
+            if king_pos:
+                break
+
+        # Check if the king is in check
+        if not self.check_check(color):
+            return False
+
+        #print(king_pos)        
+
+        # Check if the king can move out of check
+
+        
+        for row in range(king_pos[0]-1, king_pos[0]+1):
+            for col in range(king_pos[1]-1, king_pos[1]+1):                     
+                if not self.check_square(row, col, color) and (0 <= row < 8 and 0 <= col < 8) and (row,col)!=king_pos and self.is_valid_move(king_pos, (row, col), color):
+                    #print(not self.is_valid_move(king_pos, (row, col), color))
+                    #print(row, col, color)
+                    return False
+        #print(2)
+        # Check if any other piece can block the check
+        for row in range(8):
+            for col in range(8):
+                piece = self.board[row][col]
+                if not piece or piece[0] != color:
+                    continue
+                for r in range(8):
+                    for c in range(8):
+                        if self.is_valid_move((row, col), (r, c), color):
+                            # Make the move and see if the king is still in check
+                            piece_taken = self.board[r][c]
+                            self.board[r][c] = piece
+                            self.board[row][col] = None
+                            if not self.check_check(color):
+                                #print(3)
+                                self.board[row][col] = piece
+                                self.board[r][c] = piece_taken
+                                return False
+                            self.board[row][col] = piece
+                            self.board[r][c] = piece_taken
+                            #print(4)
+
+        # The king is in checkmate
+        return True
+
+
     def move_piece(self, selected_piece_pos, dest_pos,color):
-        global castle, qcastle, kcastle, passant, en_passant_target           
-                
-        if self.is_valid_move(selected_piece_pos, dest_pos,color):                        
+        global castle, qcastle, kcastle, passant, en_passant_target  
+
+        if self.is_valid_move(selected_piece_pos, dest_pos,color):                                    
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
             piece = self.board[selected_piece_pos[0]][selected_piece_pos[1]]         
             self.board[selected_piece_pos[0]][selected_piece_pos[1]] = None
-            self.board[dest_pos[0]][dest_pos[1]] = piece            
+            self.board[dest_pos[0]][dest_pos[1]] = piece
 
-            if self.check_check(color):                
+            if self.check_check(color):               
                 
                 self.board[selected_piece_pos[0]][selected_piece_pos[1]] = piece
                 self.board[dest_pos[0]][dest_pos[1]] = prev_piece
@@ -177,6 +239,8 @@ class ChessBoard:
                     self.board[en_passant_target[0]][en_passant_target[1]] = ("black" if color == "white" else "white", "pawn")                              
                 return True
             
+            move_sound.play()
+
             if en_passant_target!=None and passant:
                 passant = False
                 
@@ -184,7 +248,7 @@ class ChessBoard:
                 passant = True                
                 en_passant_target=None           
             
-            print (en_passant_target, passant)
+            #print (en_passant_target, passant)
             
 
 
@@ -192,7 +256,7 @@ class ChessBoard:
             if piece[1] == "pawn" and (dest_pos[0] == 0 or dest_pos[0] == 7):
                 self.board[dest_pos[0]][dest_pos[1]] = (color, "queen")
             
-            # Ceck for castle       
+            # Check for castle       
             if piece[1] == "king" and abs(dest_pos[1]-selected_piece_pos[1]) == 2:                
                 if dest_pos == (7,6) or dest_pos == (0,6):
                     self.board[dest_pos[0]][dest_pos[1]-1] = (color, "rook")
