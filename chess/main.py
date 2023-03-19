@@ -29,17 +29,17 @@ board.board[1] = [("black", "pawn") for _ in range(8)]
 board.board[6] = [("white", "pawn") for _ in range(8)]
 board.board[7] = [("white", "rook"), ("white", "knight"), ("white", "bishop"), ("white", "queen"), ("white", "king"), ("white", "bishop"), ("white", "knight"), ("white", "rook")]
 
-
 # board.board[0] = [None,None,None,None,None,None,None,("black", "king")]
 # board.board[1] = [None,("black", "pawn"),None,None,None,None,None,("white", "pawn")]
 # board.board[2] = [None,None,None,None,None,None,("white", "king"),None]
 # board.board[3] = [None,None,("white", "pawn"),None,None,None,None,None]
 # board.board[6] = [("white", "pawn") for _ in range(8)]
 # board.board[7] = [("white", "pawn") for _ in range(8)]
-board.board[0] = [("black", "rook"), None, None, None, ("black", "king"), None, None, ("black", "rook")]
-board.board[1] = [None for _ in range(8)]
-board.board[6] = [None for _ in range(8)]
-board.board[7] = [("white", "rook"), None, None, None, ("white", "king"), None, None, ("white", "rook")]
+
+# board.board[0] = [("black", "rook"), None, None, None, ("black", "king"), None, None, ("black", "rook")]
+# board.board[1] = [None for _ in range(8)]
+# board.board[6] = [None for _ in range(8)]
+# board.board[7] = [("white", "rook"), None, None, None, ("white", "king"), None, None, ("white", "rook")]
 
 
 white_turn = True

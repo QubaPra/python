@@ -136,22 +136,30 @@ class ChessBoard:
         elif p_type == "king":            
             if not castle[color]:           
                 if color == "white":
-                    if (not kcastle[color] and end_pos == (7,6)) or (not qcastle[color] and end_pos==(7,2)):
-                        for i in range(1, 3):
-                            col = start_col + (1 if end_col > start_col else -1) * i
-                            if self.board[start_row][col] or self.check_square(7,col-1, "black"):
+                    if not kcastle[color] and end_pos == (7,6):
+                        for i in range(1, 2):
+                            col = start_col + i
+                            if not self.board[start_row][col] == None or self.check_square(7,col, "black") or self.check_square(7,start_col, "balck"):
                                 return False
-                        if self.check_square(7,start_col + (1 if end_col > start_col else -1) * 3, "black"):
-                            return False
+                        return True
+                    elif not qcastle[color] and end_pos==(7,2):
+                        for i in range(1, 3):
+                            col = start_col - i
+                            if not self.board[start_row][col] == None or self.check_square(7,col, "black") or self.check_square(7,start_col, "balck"):
+                                return False
                         return True
                 elif color == "black":
-                    if (not kcastle[color] and end_pos == (0,6)) or (not qcastle[color] and end_pos==(0,2)):
-                        for i in range(1, 3):
-                            col = start_col + (1 if end_col > start_col else -1) * i
-                            if self.board[start_row][col] or self.check_square(0,col, "white"):
+                    if not kcastle[color] and end_pos == (0,6):
+                        for i in range(1, 2):
+                            col = start_col + i
+                            if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white"):
                                 return False                            
-                        if self.check_square(0,start_col + (1 if end_col > start_col else -1) * 3, "white"):
-                            return False
+                        return True
+                    elif not qcastle[color] and end_pos==(0,2):
+                        for i in range(1, 3):
+                            col = start_col - i
+                            if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white"):
+                                return False
                         return True
                 
             return abs(end_col - start_col) <= 1 and abs(end_row - start_row) <= 1 and (not self.board[end_row][end_col] or self.board[end_row][end_col][0] != color)
@@ -264,6 +272,7 @@ class ChessBoard:
     def move_piece(self, selected_piece_pos, dest_pos,color,player):
         
         global castle, qcastle, kcastle, passant, en_passant_target, move_50 
+        
 
         if self.is_valid_move(selected_piece_pos, dest_pos,color,player):                                    
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
@@ -287,8 +296,6 @@ class ChessBoard:
                 return True
             
             move_sound.play()
-
-            
 
             if en_passant_target!=None and passant:
                 passant = False
@@ -314,16 +321,18 @@ class ChessBoard:
 
             if piece[1] == "king":
                 castle[color]= True
-            if piece[1] == "rook":                
+            if piece[1] == "rook":                                
                 if self.board[7][7] == None:
-                    kcastle[color]=True
-                elif self.board[7][0] == None:
-                    qcastle[color]=True
-                elif self.board[0][7] == None:
-                    kcastle[color]=True
-                elif self.board[0][0] == None:
-                    qcastle[color]=True
+                    kcastle["white"]=True
+                if self.board[0][7] == None:
+                    kcastle["black"]=True
+                if self.board[7][0] == None:
+                    qcastle["white"]=True
+                if self.board[0][0] == None:
+                    qcastle["black"]=True
         
+        #print("castle=",castle,"qcastle=",qcastle,"kcastle=",kcastle)
+
         return False
     
     def check_square(self,row, col, color):
