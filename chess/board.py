@@ -56,7 +56,7 @@ class ChessBoard:
             return True
         return False
 
-    def is_valid_move(self, start_pos, end_pos, color):
+    def is_valid_move(self, start_pos, end_pos, color,player):
         global check, castle, qcastle, kcastle, en_passant_target, passant
         start_row, start_col = start_pos
         end_row, end_col = end_pos
@@ -92,7 +92,8 @@ class ChessBoard:
                 # Check for en passant capture
                 
                 elif (end_row + (1 if color == "white" else -1), end_col )== en_passant_target:
-                    self.board[en_passant_target[0]][en_passant_target[1]] = None
+                    if player:
+                        self.board[en_passant_target[0]][en_passant_target[1]] = None
                     return True
 
         elif p_type == "rook":
@@ -181,7 +182,7 @@ class ChessBoard:
         for row in range(8):
             for col in range(8):
                 piece = self.board[row][col]
-                if piece and piece[0] != color and self.is_valid_move((row, col), (king_row, king_col), "black" if color == "white" else "white"):
+                if piece and piece[0] != color and self.is_valid_move((row, col), (king_row, king_col), "black" if color == "white" else "white",False):
                     #print("in check")
                     return True
             else:
@@ -211,7 +212,7 @@ class ChessBoard:
         
         for row in range(king_pos[0]-1, king_pos[0]+1):
             for col in range(king_pos[1]-1, king_pos[1]+1):                     
-                if not self.check_square(row, col, color) and (0 <= row < 8 and 0 <= col < 8) and (row,col)!=king_pos and self.is_valid_move(king_pos, (row, col), color):
+                if not self.check_square(row, col, color) and (0 <= row < 8 and 0 <= col < 8) and (row,col)!=king_pos and self.is_valid_move(king_pos, (row, col), color,False):
                     #print(not self.is_valid_move(king_pos, (row, col), color))
                     #print(row, col, color)
                     return False
@@ -224,7 +225,7 @@ class ChessBoard:
                     continue
                 for r in range(8):
                     for c in range(8):
-                        if self.is_valid_move((row, col), (r, c), color):
+                        if self.is_valid_move((row, col), (r, c), color,False):
                             # Make the move and see if the king is still in check
                             piece_taken = self.board[r][c]
                             self.board[r][c] = piece
@@ -241,59 +242,29 @@ class ChessBoard:
         # The king is in checkmate
         return True
 
-    def is_stalemate(self, color):
-        # Find the king        
-        king_pos = None
-        for row in range(8):
-            for col in range(8):
-                if self.board[row][col] == (color, "king"):
-                    king_pos = (row, col)
-                    break
-            if king_pos:
-                break        
-        #print(king_pos)        
-
-        # Check if the king can move out of check        
-        for row in range(king_pos[0]-1, king_pos[0]+1):
-            for col in range(king_pos[1]-1, king_pos[1]+1):                     
-                if not self.check_square(row, col, color) and (0 <= row < 8 and 0 <= col < 8) and (row,col)!=king_pos and self.is_valid_move(king_pos, (row, col), color):
-                    #print(not self.is_valid_move(king_pos, (row, col), color))
-                    #print(row, col, color)
-                    return False
-        #print(2)
-        # Check if any other piece can block the check
+    def is_stalemate(self, color):  
+        # Check if any move can be made by the color
         for row in range(8):
             for col in range(8):
                 piece = self.board[row][col]
-                if not piece or piece[0] != color:
-                    continue
-                for r in range(8):
-                    for c in range(8):
-                        if self.is_valid_move((row, col), (r, c), color):
-                            # Make the move and see if the king is still in check
-                            piece_taken = self.board[r][c]
-                            self.board[r][c] = piece
-                            self.board[row][col] = None
-                            if not self.check_check(color):
-                                #print(3)
-                                self.board[row][col] = piece
-                                self.board[r][c] = piece_taken
+                if piece and piece[0] == color:
+                    for row2 in range(8):
+                        for col2 in range(8):
+                            if self.is_valid_move((row, col), (row2, col2), color,False) and not (piece[1]=="king" and self.check_square(row2,col2,color)):                                                                                                  
                                 return False
-                            self.board[row][col] = piece
-                            self.board[r][c] = piece_taken
-                            #print(4)
 
-        # The king is in checkmate
+        # If no move can be made, it is stalemate
         return True
 
     def move_50_rule(self):
         global move_50        
         return move_50 >=50        
 
-    def move_piece(self, selected_piece_pos, dest_pos,color):
+    def move_piece(self, selected_piece_pos, dest_pos,color,player):
+        
         global castle, qcastle, kcastle, passant, en_passant_target, move_50 
 
-        if self.is_valid_move(selected_piece_pos, dest_pos,color):                                    
+        if self.is_valid_move(selected_piece_pos, dest_pos,color,player):                                    
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
             piece = self.board[selected_piece_pos[0]][selected_piece_pos[1]]         
             self.board[selected_piece_pos[0]][selected_piece_pos[1]] = None
@@ -361,7 +332,7 @@ class ChessBoard:
                 piece = self.board[r][c]
                 if piece and piece[0] == color:
                     # Check if the piece can move to the square
-                    if self.is_valid_move((r, c), (row, col), piece[0]):
+                    if self.is_valid_move((r, c), (row, col), piece[0],False):
                         return True
         return False
     
