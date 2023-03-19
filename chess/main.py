@@ -30,16 +30,19 @@ board.board[6] = [("white", "pawn") for _ in range(8)]
 board.board[7] = [("white", "rook"), ("white", "knight"), ("white", "bishop"), ("white", "queen"), ("white", "king"), ("white", "bishop"), ("white", "knight"), ("white", "rook")]
 
 
-board.board[0] = [None,None,None,None,None,None,None,("black", "king")]
-board.board[1] = [None,("black", "pawn"),None,None,None,None,None,("white", "pawn")]
-board.board[2] = [None,None,None,None,None,None,("white", "king"),None]
-board.board[3] = [None,None,("white", "pawn"),None,None,None,None,None]
-board.board[6] = [("white", "pawn") for _ in range(8)]
-board.board[7] = [("white", "pawn") for _ in range(8)]
+# board.board[0] = [None,None,None,None,None,None,None,("black", "king")]
+# board.board[1] = [None,("black", "pawn"),None,None,None,None,None,("white", "pawn")]
+# board.board[2] = [None,None,None,None,None,None,("white", "king"),None]
+# board.board[3] = [None,None,("white", "pawn"),None,None,None,None,None]
+# board.board[6] = [("white", "pawn") for _ in range(8)]
+# board.board[7] = [("white", "pawn") for _ in range(8)]
+board.board[0] = [("black", "rook"), None, None, None, ("black", "king"), None, None, ("black", "rook")]
+board.board[1] = [None for _ in range(8)]
+board.board[6] = [None for _ in range(8)]
+board.board[7] = [("white", "rook"), None, None, None, ("white", "king"), None, None, ("white", "rook")]
 
 
 white_turn = True
-
 game_over = False
 
 # Game Loop
@@ -62,6 +65,9 @@ while not game_over:
                 row, col = mouse_pos[1] // 60, mouse_pos[0] // 60
                 if board.is_valid_move(selected_piece_pos, (row, col), "white" if white_turn else "black",True):
                     if not (board.move_piece(selected_piece_pos, (row, col), "white" if white_turn else "black",True)):
+                        if board.repetition(selected_piece_pos,row, col):
+                            winner = "Draw"
+                            game_over = True
                         white_turn = not white_turn                 
                 selected_piece = None
                 selected_piece_pos = None

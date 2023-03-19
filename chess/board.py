@@ -15,6 +15,7 @@ kcastle = {"white": False, "black": False}
 en_passant_target = None
 passant = True
 move_50 = 0
+allmoves = []
 
 class ChessBoard:
     def __init__(self, width=480, height=480, square_size=60):
@@ -326,7 +327,7 @@ class ChessBoard:
         return False
     
     def check_square(self,row, col, color):
-
+        
         for r in range(8):
             for c in range(8):
                 piece = self.board[r][c]
@@ -336,5 +337,10 @@ class ChessBoard:
                         return True
         return False
     
+    def repetition(self, selected_piece_pos,row, col):        
+        allmoves.append((selected_piece_pos,(row,col)))
+        if len(allmoves)>8:
+            return (allmoves[-1]==allmoves[-5]==allmoves[-9] and allmoves[-2]==allmoves[-6])
+        
     
 
