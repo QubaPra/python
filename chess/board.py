@@ -14,6 +14,7 @@ qcastle = {"white": False, "black": False}
 kcastle = {"white": False, "black": False}
 en_passant_target = None
 passant = True
+move_50 = 0
 
 class ChessBoard:
     def __init__(self, width=480, height=480, square_size=60):
@@ -285,13 +286,23 @@ class ChessBoard:
         # The king is in checkmate
         return True
 
+    def move_50_rule(self):
+        global move_50        
+        return move_50 >=50        
+
     def move_piece(self, selected_piece_pos, dest_pos,color):
-        global castle, qcastle, kcastle, passant, en_passant_target 
+        global castle, qcastle, kcastle, passant, en_passant_target, move_50 
 
         if self.is_valid_move(selected_piece_pos, dest_pos,color):                                    
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
             piece = self.board[selected_piece_pos[0]][selected_piece_pos[1]]         
             self.board[selected_piece_pos[0]][selected_piece_pos[1]] = None
+            
+            if piece[1] != "pawn" and self.board[dest_pos[0]][dest_pos[1]] == 0 or self.board[dest_pos[0]][dest_pos[1]] == None:
+                move_50+=1
+            elif piece[1] == "pawn" or self.board[dest_pos[0]][dest_pos[1]] != 0 or self.board[dest_pos[0]][dest_pos[1]] != None:                
+                move_50=0
+
             self.board[dest_pos[0]][dest_pos[1]] = piece
 
             if self.check_check(color):               
@@ -299,10 +310,13 @@ class ChessBoard:
                 self.board[selected_piece_pos[0]][selected_piece_pos[1]] = piece
                 self.board[dest_pos[0]][dest_pos[1]] = prev_piece
                 if en_passant_target!=None and not passant:
-                    self.board[en_passant_target[0]][en_passant_target[1]] = ("black" if color == "white" else "white", "pawn")                              
+                    self.board[en_passant_target[0]][en_passant_target[1]] = ("black" if color == "white" else "white", "pawn")
+                move_50-=1                                             
                 return True
             
             move_sound.play()
+
+            
 
             if en_passant_target!=None and passant:
                 passant = False

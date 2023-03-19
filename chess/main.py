@@ -30,10 +30,10 @@ board.board[6] = [("white", "pawn") for _ in range(8)]
 board.board[7] = [("white", "rook"), ("white", "knight"), ("white", "bishop"), ("white", "queen"), ("white", "king"), ("white", "bishop"), ("white", "knight"), ("white", "rook")]
 
 
-board.board[1] = [ ("black", "king"),("black", "bishop"),None,None,None,None,None,None]
-board.board[6] = [None for _ in range(8)]
+board.board[1] = [ ("black", "king"),("black", "bishop"),None,None,None,None,("black", "pawn"),None]
+board.board[7] = [None for _ in range(8)]
 board.board[0] = [None for _ in range(8)]
-board.board[7] = [None,("white", "queen"),  None, ("white", "king"),None,None,None,None]
+board.board[6] = [None,("white", "queen"),  None, ("white", "king"),None,None,None,("white", "pawn")]
 
 
 white_turn = True
@@ -72,7 +72,7 @@ while not game_over:
             elif board.is_stalemate("white") or board.is_stalemate("black"):                     
                 winner = "Stalemate"
                 game_over = True            
-            elif board.draw_material():
+            elif board.draw_material() or board.move_50_rule():
                 winner = "Draw"
                 game_over = True
             
