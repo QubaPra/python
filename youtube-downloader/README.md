@@ -1,6 +1,6 @@
-# Morse Code Audio Decoder
+# YoutubeDownloader
 
-A simple Python program using artificial intelligence libraries to decode audio morse code.
+A youtube video or audio downloader. You can choose quality of video.
 
 
 ### Installation
@@ -11,6 +11,4 @@ To use this code, you'll need to install [Python](https://www.python.org/downloa
 
 ### Run
 
-Just open `morse.py`.
-
->**Note:** You can add your signal.wav morse code signal.
+Just open `youtube.py`.
