@@ -1,8 +1,11 @@
 import pygame
 
 pygame.mixer.init()
-move_sound = pygame.mixer.Sound("./sounds/move.mp3")
-
+move_sound = pygame.mixer.Sound("./sounds/move.wav")
+take_sound = pygame.mixer.Sound("./sounds/take.wav")
+castle_sound = pygame.mixer.Sound("./sounds/castle.wav")
+check_sound = pygame.mixer.Sound("./sounds/check.wav")
+promo_sound = pygame.mixer.Sound("./sounds/promo.wav")
 # Define constants for the colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -30,10 +33,11 @@ class ChessBoard:
             for col in range(8):
                 color = WHITE if (row + col) % 2 == 0 else GRAY
                 if self.check_check("white") and self.board[row][col] == ("white", "king"):
-                    color = (255, 0, 0)
+                    color = (255, 0, 0)                    
                 elif self.check_check("black") and self.board[row][col] == ("black", "king"):
-                    color = (255, 0, 0)
+                    color = (255, 0, 0)                    
                 pygame.draw.rect(self.screen, color, [col * self.square_size, row * self.square_size, self.square_size, self.square_size])
+                
     
     def draw_material(self):
         pieces = {}
@@ -138,26 +142,26 @@ class ChessBoard:
                 if color == "white":
                     if not kcastle[color] and end_pos == (7,6):
                         for i in range(1, 2):
-                            col = start_col + i
+                            col = (start_col + i)%8
                             if not self.board[start_row][col] == None or self.check_square(7,col, "black") or self.check_square(7,start_col, "balck"):
                                 return False
                         return True
                     elif not qcastle[color] and end_pos==(7,2):
-                        for i in range(1, 3):
-                            col = start_col - i
+                        for i in range(1, 4):
+                            col = (start_col - i)%8
                             if not self.board[start_row][col] == None or self.check_square(7,col, "black") or self.check_square(7,start_col, "balck"):
                                 return False
                         return True
                 elif color == "black":
                     if not kcastle[color] and end_pos == (0,6):
                         for i in range(1, 2):
-                            col = start_col + i
+                            col = (start_col + i)%8
                             if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white"):
                                 return False                            
                         return True
                     elif not qcastle[color] and end_pos==(0,2):
-                        for i in range(1, 3):
-                            col = start_col - i
+                        for i in range(1, 4):
+                            col = (start_col - i)%8
                             if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white"):
                                 return False
                         return True
@@ -276,6 +280,7 @@ class ChessBoard:
 
         if self.is_valid_move(selected_piece_pos, dest_pos,color,player):                                    
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
+                      
             piece = self.board[selected_piece_pos[0]][selected_piece_pos[1]]         
             self.board[selected_piece_pos[0]][selected_piece_pos[1]] = None
             
@@ -295,7 +300,7 @@ class ChessBoard:
                 move_50-=1                                             
                 return True
             
-            move_sound.play()
+            
 
             if en_passant_target!=None and passant:
                 passant = False
@@ -306,11 +311,7 @@ class ChessBoard:
             
             #print (en_passant_target, passant)   
 
-            # Check for pawn promotion
-            if piece[1] == "pawn" and (dest_pos[0] == 0 or dest_pos[0] == 7):
-                self.board[dest_pos[0]][dest_pos[1]] = (color, "queen")
-            
-            # Check for castle       
+            # Check for castle and promo     
             if piece[1] == "king" and abs(dest_pos[1]-selected_piece_pos[1]) == 2:                
                 if dest_pos == (7,6) or dest_pos == (0,6):
                     self.board[dest_pos[0]][dest_pos[1]-1] = (color, "rook")
@@ -318,6 +319,19 @@ class ChessBoard:
                 elif dest_pos == (7,2) or dest_pos == (0,2):
                     self.board[dest_pos[0]][dest_pos[1]+1] = (color, "rook")
                     self.board[dest_pos[0]][0] = None
+                castle_sound.play()
+            else:
+                if self.check_check("white") or self.check_check("black"):
+                    check_sound.play()
+                elif piece[1] == "pawn" and (dest_pos[0] == 0 or dest_pos[0] == 7):
+                    self.board[dest_pos[0]][dest_pos[1]] = (color, "queen")
+                    promo_sound.play()
+                elif piece[1] == "pawn" and abs(dest_pos[1] - selected_piece_pos[1]) == 1:
+                    take_sound.play()
+                elif prev_piece !=None and prev_piece!=0:
+                    take_sound.play()
+                else:
+                    move_sound.play()
 
             if piece[1] == "king":
                 castle[color]= True

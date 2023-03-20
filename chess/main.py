@@ -2,6 +2,12 @@ import pygame
 from board import ChessBoard
 from pieces import ChessPieces
 
+pygame.mixer.init()
+draw_sound = pygame.mixer.Sound("./sounds/draw.wav")
+checkmate_sound = pygame.mixer.Sound("./sounds/checkmate.wav")
+start_sound = pygame.mixer.Sound("./sounds/start.wav")
+
+start_sound.play()
 
 # Define constants for the colors
 BLACK = (0, 0, 0)
@@ -74,15 +80,19 @@ while not game_over:
             if board.is_checkmate("black"):          
                 winner = "White"
                 game_over = True
+                checkmate_sound.play()
             elif board.is_checkmate("white"):                     
                 winner = "Black"
                 game_over = True
+                checkmate_sound.play()
             elif board.is_stalemate("white" if white_turn else "black"):                     
                 winner = "Stalemate"
-                game_over = True            
+                game_over = True
+                draw_sound.play()            
             elif board.draw_material() or board.move_50_rule():
                 winner = "Draw"
                 game_over = True
+                draw_sound.play()
             
                 
 
