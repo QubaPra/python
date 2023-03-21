@@ -5,7 +5,7 @@ move_sound = pygame.mixer.Sound("./sounds/move.wav")
 take_sound = pygame.mixer.Sound("./sounds/take.wav")
 castle_sound = pygame.mixer.Sound("./sounds/castle.wav")
 check_sound = pygame.mixer.Sound("./sounds/check.wav")
-promo_sound = pygame.mixer.Sound("./sounds/promo.wav")
+
 # Define constants for the colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -38,7 +38,6 @@ class ChessBoard:
                     color = (255, 0, 0)                    
                 pygame.draw.rect(self.screen, color, [col * self.square_size, row * self.square_size, self.square_size, self.square_size])
                 
-    
     def draw_material(self):
         pieces = {}
         for row in self.board:
@@ -72,8 +71,19 @@ class ChessBoard:
             return False        
         p_type = piece[1]
 
-        if p_type == "pawn":
-            if start_col == end_col:
+        if p_type == "pawn":            
+            if abs(end_col - start_col) == 1 and end_row == start_row + (-1 if color == "white" else 1):
+                target_piece = self.board[end_row][end_col]
+                if target_piece and target_piece[0] != color:
+                    return True
+                # Check for en passant capture
+                
+                elif (end_row + (1 if color == "white" else -1), end_col )== en_passant_target:
+                    if player:
+                        self.board[en_passant_target[0]][en_passant_target[1]] = None
+                    return True
+            
+            elif start_col == end_col:
                 if color == "white":
                     if end_row == start_row - 1 and not self.board[end_row][end_col]:
                         return True
@@ -90,16 +100,6 @@ class ChessBoard:
                         passant = True
                         #print(en_passant_target)
                         return True
-            elif abs(end_col - start_col) == 1 and end_row == start_row + (-1 if color == "white" else 1):
-                target_piece = self.board[end_row][end_col]
-                if target_piece and target_piece[0] != color:
-                    return True
-                # Check for en passant capture
-                
-                elif (end_row + (1 if color == "white" else -1), end_col )== en_passant_target:
-                    if player:
-                        self.board[en_passant_target[0]][en_passant_target[1]] = None
-                    return True
 
         elif p_type == "rook":
             if start_row == end_row:
@@ -141,28 +141,28 @@ class ChessBoard:
             if not castle[color]:           
                 if color == "white":
                     if not kcastle[color] and end_pos == (7,6):
-                        for i in range(1, 2):
-                            col = (start_col + i)%8
+                        for i in range(1, 3):
+                            col = (start_col + i)%8                            
                             if not self.board[start_row][col] == None or self.check_square(7,col, "black") or self.check_square(7,start_col, "balck"):
                                 return False
                         return True
                     elif not qcastle[color] and end_pos==(7,2):
                         for i in range(1, 4):
-                            col = (start_col - i)%8
+                            col = (start_col - i)%8                            
                             if not self.board[start_row][col] == None or self.check_square(7,col, "black") or self.check_square(7,start_col, "balck"):
                                 return False
                         return True
                 elif color == "black":
                     if not kcastle[color] and end_pos == (0,6):
-                        for i in range(1, 2):
-                            col = (start_col + i)%8
-                            if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white"):
+                        for i in range(1, 3):
+                            col = (start_col + i)%8                            
+                            if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white") :
                                 return False                            
                         return True
                     elif not qcastle[color] and end_pos==(0,2):
                         for i in range(1, 4):
-                            col = (start_col - i)%8
-                            if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white"):
+                            col = (start_col - i)%8                            
+                            if not self.board[start_row][col] == None or self.check_square(0,col, "white") or self.check_square(0,start_col, "white") :
                                 return False
                         return True
                 
@@ -277,7 +277,6 @@ class ChessBoard:
         
         global castle, qcastle, kcastle, passant, en_passant_target, move_50 
         
-
         if self.is_valid_move(selected_piece_pos, dest_pos,color,player):                                    
             prev_piece = self.board[dest_pos[0]][dest_pos[1]]
                       
@@ -323,9 +322,8 @@ class ChessBoard:
             else:
                 if self.check_check("white") or self.check_check("black"):
                     check_sound.play()
-                elif piece[1] == "pawn" and (dest_pos[0] == 0 or dest_pos[0] == 7):
-                    self.board[dest_pos[0]][dest_pos[1]] = (color, "queen")
-                    promo_sound.play()
+                elif piece[1] == "pawn" and (dest_pos[0] == 0 or dest_pos[0] == 7):                    
+                    pass
                 elif piece[1] == "pawn" and abs(dest_pos[1] - selected_piece_pos[1]) == 1:
                     take_sound.play()
                 elif prev_piece !=None and prev_piece!=0:
@@ -364,6 +362,3 @@ class ChessBoard:
         allmoves.append((selected_piece_pos,(row,col)))
         if len(allmoves)>8:
             return (allmoves[-1]==allmoves[-5]==allmoves[-9] and allmoves[-2]==allmoves[-6])
-        
-    
-

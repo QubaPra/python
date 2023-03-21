@@ -6,6 +6,7 @@ pygame.mixer.init()
 draw_sound = pygame.mixer.Sound("./sounds/draw.wav")
 checkmate_sound = pygame.mixer.Sound("./sounds/checkmate.wav")
 start_sound = pygame.mixer.Sound("./sounds/start.wav")
+promo_sound = pygame.mixer.Sound("./sounds/promo.wav")
 
 start_sound.play()
 
@@ -47,7 +48,6 @@ board.board[7] = [("white", "rook"), ("white", "knight"), ("white", "bishop"), (
 # board.board[6] = [None for _ in range(8)]
 # board.board[7] = [("white", "rook"), None, None, None, ("white", "king"), None, None, ("white", "rook")]
 
-
 white_turn = True
 game_over = False
 
@@ -73,8 +73,41 @@ while not game_over:
                     if not (board.move_piece(selected_piece_pos, (row, col), "white" if white_turn else "black",True)):
                         if board.repetition(selected_piece_pos,row, col):
                             winner = "Draw"
-                            game_over = True
-                        white_turn = not white_turn                 
+                            game_over = True                        
+                        if piece[1] == "pawn" and (row==0 or row==7):
+                            color="white" if white_turn else "black"                            
+                            queen_rect = pieces.images[color + "_queen"].get_rect(topleft=(30, 210))
+                            rook_rect = pieces.images[color + "_rook"].get_rect(topleft=(150, 210))
+                            bishop_rect = pieces.images[color + "_bishop"].get_rect(topleft=(270, 210))
+                            knight_rect = pieces.images[color + "_knight"].get_rect(topleft=(390, 210))
+                            promo=True
+                            while promo:
+                                for event in pygame.event.get():
+                                    if event.type == pygame.QUIT:
+                                        pygame.quit()
+                                        quit()
+                                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                                        # Get the mouse position
+                                        mouse_pos = pygame.mouse.get_pos()
+                                        # Check if the mouse position is within the bounds of any image
+                                        if queen_rect.collidepoint(mouse_pos):
+                                            board.board[row][col] = (color, "queen")
+                                            promo=False
+                                        elif rook_rect.collidepoint(mouse_pos):
+                                            board.board[row][col] = (color, "rook")
+                                            promo=False
+                                        elif bishop_rect.collidepoint(mouse_pos):
+                                            board.board[row][col] = (color, "bishop")
+                                            promo=False
+                                        elif knight_rect.collidepoint(mouse_pos):
+                                            board.board[row][col] = (color, "knight")
+                                            promo=False                                        
+                                pieces.promoui(screen,color)
+                                # Update the display
+                                pygame.display.update()
+                                clock.tick(60)
+                            promo_sound.play()
+                        white_turn = not white_turn    
                 selected_piece = None
                 selected_piece_pos = None
             if board.is_checkmate("black"):          
@@ -92,9 +125,7 @@ while not game_over:
             elif board.draw_material() or board.move_50_rule():
                 winner = "Draw"
                 game_over = True
-                draw_sound.play()
-            
-                
+                draw_sound.play()                     
 
     # Draw the board and pieces
     board.draw()
@@ -102,7 +133,6 @@ while not game_over:
 
     # Update the display
     pygame.display.update()
-
     clock.tick(60)
 
 # Game over loop
@@ -148,5 +178,4 @@ while game_over:
 
     # Update the display
     pygame.display.update()
-
     clock.tick(60)

@@ -41,4 +41,22 @@ class ChessPieces:
                 mouse_pos = pygame.mouse.get_pos()
                 mouse_x, mouse_y = mouse_pos
                 pos = (mouse_x - 60 / 2, mouse_y - 60 / 2)
-                self.screen.blit(img, pos)
+                self.screen.blit(img, pos) 
+
+    def promoui(self, screen, color):
+        self.screen = screen
+        # Create a surface for the stroke
+        stroke = pygame.Surface((600, 110))
+        stroke2 = pygame.Surface((600, 120))
+
+        # Fill the stroke with the stroke color
+        stroke.fill((200,200,200))
+        stroke2.fill((128,128,128))
+
+        screen.blit(stroke2, stroke2.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2)))
+        screen.blit(stroke, stroke.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2)))
+        
+        self.screen.blit(self.images[color + "_queen"], (30,210))
+        self.screen.blit(self.images[color + "_rook"], (150,210))
+        self.screen.blit(self.images[color + "_bishop"], (270,210))
+        self.screen.blit(self.images[color + "_knight"], (390,210))
