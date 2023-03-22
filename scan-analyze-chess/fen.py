@@ -1,7 +1,6 @@
-from PIL import Image
 from PIL import ImageGrab
 import numpy as np
-import cv2
+import webbrowser
 from tensorflow import keras
 
 pieces = ["b","k","n", "p", "q", "r", "1","B","K", "N", "P", "Q", "R"]
@@ -57,4 +56,13 @@ for i in range(8):
     if i<7:
         fen+="/"
 
-print(fen)
+color = input("White move (w) or Black move (b)")
+url = f"https://lichess.org/analysis/{fen}"
+if "w" in color.lower():
+    url+=" w"
+    webbrowser.open(url)
+elif "b" in color.lower():
+    url+=" b"
+    webbrowser.open(url)
+else:
+    print(fen)
