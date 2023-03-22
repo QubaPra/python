@@ -1,6 +1,7 @@
 from PIL import Image
-import cv2
+from PIL import ImageGrab
 import numpy as np
+import cv2
 from tensorflow import keras
 
 pieces = ["b","k","n", "p", "q", "r", "1","B","K", "N", "P", "Q", "R"]
@@ -8,36 +9,39 @@ pieces = ["b","k","n", "p", "q", "r", "1","B","K", "N", "P", "Q", "R"]
 # Load the trained model
 model = keras.models.load_model('model.h5')
 
-# Open the image
-img = Image.open("./image.png")
+# Get the image from the clipboard
+img = ImageGrab.grabclipboard()
+
+if img is None:
+    quit()
+
+img = img.convert("RGB")
 
 # Get the size of the image
 width, height = img.size
 
-# Set the number of pieces to divide the image into
-rows = cols = 8
-
-# Calculate the size of each piece
-piece_width = width // cols
-piece_height = height // rows
+size = min(width, height)
+left = (width - size) // 2
+top = (height - size) // 2
+right = left + size
+bottom = top + size
+img = img.crop((left, top, right, bottom))
+img = img.resize((480,480))
 
 fen=""
 
 # Loop through the image and crop each piece
-for i in range(rows):
-    for j in range(cols):
-        left = j * piece_width
-        top = i * piece_height
-        right = left + piece_width
-        bottom = top + piece_height
-        piece = img.crop((left, top, right, bottom))
-                
-        # load and convert the image to a numpy array
-        piece = piece.resize((60, 60))            
-        
+for i in range(8):
+    for j in range(8):
+        left = j * 60
+        top = i * 60
+        right = left + 60
+        bottom = top + 60
+        piece = img.crop((left, top, right, bottom))                                   
+        #piece.save(f"test{i}_{j}.png")
         # normalize the image data
-        piece = np.array(piece) / 255.0        
-
+        piece = np.array(piece) / 255.0    
+        
         # Make a prediction
         predictions = model.predict(np.expand_dims(piece, axis=0))
             
