@@ -1,0 +1,36 @@
+[   {   
+        "tag": "1",
+        "pattern": ["Cześć", "Czy ktoś jest?", "Witaj"],
+        "responses": ["Cześć"]
+    },
+    {
+        "tag": "2",
+        "pattern": ["Kim jesteś", "Jak masz na imię?", "Czy masz jakieś imię?"],
+        "responses": ["Jestem Quba"]
+    },
+    {
+        "tag": "5",
+        "pattern": ["Jaka jest dziś pogoda?"],
+        "responses": ["Jest słonecznie"]
+    },
+    {
+        "tag": "6",
+        "pattern": ["Jakie wydarzenia są dzisiaj dostępne?"],
+        "responses": ["Nie wiem?"]
+    },
+    {
+        "tag": "7",
+        "pattern": ["Jak się masz?", "Co słychać?"],
+        "responses": ["Dobrze się czuję"]
+    },
+    {
+        "tag": "8",
+        "pattern": ["Do widzenia", "Do zobaczenia później", "Żegnaj"],
+        "responses": ["Do zobaczenia później"]
+    },
+    {
+        "tag": "9",
+        "pattern": ["Dziękuję"],
+        "responses": ["Nie ma za co"]
+    }
+]
