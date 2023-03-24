@@ -1,0 +1,126 @@
+questions:
+  imię:
+  - Twoje imię?
+  kolor:
+  - Ulubiony kolor?
+  wiek:
+  - Ile masz lat?
+  zwierzę:
+  - Jakie zwierzęta najbardziej lubisz?
+  jedzenie:
+  - Jakie jest twoje ulubione danie?
+  hobby:
+  - Jakie masz hobby?
+  film:
+  - Jaki jest Twój ulubiony film?
+  sport:
+  - Jakie jest twoje ulubiony sport?
+  miasto:
+  - Jakie jest twoje ulubione miasto?
+  praca:
+  - Jaką pracę wykonujesz?
+  muzyka:
+  - Jaką muzykę lubisz słuchać?
+  samochód:
+  - Jakie jest twoje auto marzeń?
+  książka:
+  - Lubisz czytać książki?
+  marzenie:
+  - Jakie jest twoje największe marzenie?
+  napój:
+  - Jaki jest twój ulubiony napój?
+  piosenka:
+  - Jaką piosenkę najbardziej lubisz?
+  obiad:
+  - Co zjadłbyś na obiad?
+  uczucie:
+  - Jak się czujesz?
+  planeta:
+  - Która planeta podoba ci się najbardziej?
+  roślina:
+  - Jakie rośliny lubisz hodować?
+  bohater:
+  - Który bohater z książki, filmu lub gry jest dla ciebie najważniejszy?
+  zespół:
+  - Jaki jest twój ulubiony zespół muzyczny?
+  język:
+  - Czy lubisz poznawać nowe języki?
+  przedmiot:
+  - Który przedmiot na studiach lubiłeś najbardziej?
+  napój alkoholowy:
+  - Jaki jest twój ulubiony napój alkoholowy?
+  jedzenie fast food:
+  - Jakie jedzenie fast food lubisz?
+  owoc:
+  - Jaki owoc lubisz najbardziej?
+  warzywo:
+  - Jakie warzywo lubisz najbardziej?
+  zwierzę domowe:
+  - Czy posiadasz zwierzę domowe?
+  owad:
+  - Jaki owad uważasz za najbardziej interesujący?
+  pora roku:
+  - Jaka jest twoja ulubiona pora roku?
+answers:
+  imię:
+  - Quba: 1
+  kolor:
+  - Czarny: 1
+  wiek:
+  - '19': 1
+  zwierzę:
+  - Jakie zwierzęta najbardziej lubisz?
+  jedzenie:
+  - Jakie jest twoje ulubione danie?
+  hobby:
+  - Jakie masz hobby?
+  film:
+  - Jaki jest Twój ulubiony film?
+  sport:
+  - Jakie jest twoje ulubiony sport?
+  miasto:
+  - Jakie jest twoje ulubione miasto?
+  praca:
+  - Jaką pracę wykonujesz?
+  muzyka:
+  - Jaką muzykę lubisz słuchać?
+  samochód:
+  - Jakie jest twoje auto marzeń?
+  książka:
+  - Lubisz czytać książki?
+  marzenie:
+  - Jakie jest twoje największe marzenie?
+  napój:
+  - Jaki jest twój ulubiony napój?
+  piosenka:
+  - Jaką piosenkę najbardziej lubisz?
+  obiad:
+  - Co zjadłbyś na obiad?
+  uczucie:
+  - Jak się czujesz?
+  planeta:
+  - Która planeta podoba ci się najbardziej?
+  roślina:
+  - Jakie rośliny lubisz hodować?
+  bohater:
+  - Który bohater z książki, filmu lub gry jest dla ciebie najważniejszy?
+  zespół:
+  - Jaki jest twój ulubiony zespół muzyczny?
+  język:
+  - Czy lubisz poznawać nowe języki?
+  przedmiot:
+  - Który przedmiot na studiach lubiłeś najbardziej?
+  napój alkoholowy:
+  - Jaki jest twój ulubiony napój alkoholowy?
+  jedzenie fast food:
+  - Jakie jedzenie fast food lubisz?
+  owoc:
+  - Jaki owoc lubisz najbardziej?
+  warzywo:
+  - Jakie warzywo lubisz najbardziej?
+  zwierzę domowe:
+  - Czy posiadasz zwierzę domowe?
+  owad:
+  - Jaki owad uważasz za najbardziej interesujący?
+  pora roku:
+  - Jaka jest twoja ulubiona pora roku?
