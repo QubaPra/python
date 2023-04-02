@@ -1,44 +1,83 @@
-import pytube
-from tkinter import filedialog, Tk
+from pytube import YouTube
+import threading
+import os
+import time
+from tkinter import Tk, filedialog
+import pyperclip
 
-link = input("Enter the YouTube link: ")
+down_audio = False
 
-yt = pytube.YouTube(link)
+# get the URL from the clipboard
+url = pyperclip.paste()
 
-# Prompt the user to select whether to download audio or video
-download_type = input("Do you want to download audio (a) or video (v)? ")
-audio = yt.streams.filter(type="audio").order_by("abr").last()
+# check if the URL is a valid YouTube URL
+if "youtube.com" not in url and "youtu.be" not in url:
+    print("Invalid YouTube URL.")
+    exit()
 
-if download_type == "v":
-    # Filter and print out only the video streams, sorted by resolution
-    video_streams = yt.streams.filter(type="video").order_by("resolution").desc()
-    stream_info = {}
-    for stream in video_streams:
-        if stream.resolution == "2160p":
-            ext = stream.mime_type.split('/')[-1]
-        elif stream.resolution == "1440p":
-            ext = stream.mime_type.split('/')[-1]
-        else:
-            ext = "mp4"
-        stream_info[f"{stream.resolution} {stream.fps}fps {ext}"] = stream
+# create a YouTube object with the URL
+yt = YouTube(url)
 
-    for i, info in enumerate(stream_info.keys()):
-        print(f"{i}: {info}")
+# get all available streams and sort by resolution in descending order
+video = yt.streams.order_by('resolution').desc()
 
-    # Prompt the user to select a video stream to download
-    stream_num = int(input("Enter the stream number to download: "))
-    stream = list(stream_info.values())[stream_num]
+# create an empty list to keep track of unique streams
+video_list = []
 
-# Prompt the user to select a download location using a file dialog
+# loop through streams and print unique streams
+print("Available Video:")
+for i, stream in enumerate(video):
+    if not((stream.mime_type == "video/webm" and len(stream.resolution) < 5) or stream.mime_type == "video/3gpp"):    
+        stream_info = (stream.resolution, stream.mime_type, stream.abr, stream.fps)
+        if stream_info not in video_list:
+            video_list.append(stream_info)
+            ext = (stream.mime_type).split("/")[-1]
+            print(f"{len(video_list)}. {stream.resolution} {stream.fps}fps {ext} ({round(stream.filesize/(1024*1024))} MB) {'audio' if stream.abr else ''}")
+
+# create an empty list to keep track of unique streams
+audio = yt.streams.filter(only_audio=True).order_by('abr').desc()
+audio_list = []
+
+print("Available Audio:")
+for i, stream in enumerate(audio):
+    audio_list.append((stream.mime_type, stream.abr))
+    ext = (stream.mime_type).split("/")[-1]
+    print(f"{len(audio_list)+len(video_list)}. {stream.abr} {ext} ({round(stream.filesize/(1024*1024))} MB) audio")
+
+# ask user to choose a stream to download
+stream_num = input("Enter the number of the stream you want to download: ")
+
+if stream_num[-1] == "a":
+    stream_num = int(stream_num[:-1])
+    down_audio = True
+else:
+    stream_num = int(stream_num)
+
+if stream_num > len(video_list):
+    selected_stream = audio.filter(mime_type=audio_list[stream_num-1-len(video_list)][0], abr=audio_list[stream_num-1-len(video_list)][1]).first()
+else:
+    selected_stream = video.filter(resolution=video_list[stream_num-1][0], mime_type=video_list[stream_num-1][1], abr=video_list[stream_num-1][2], fps=video_list[stream_num-1][3]).first()
+
+# choose download directory with file dialog
 root = Tk()
 root.withdraw()
-download_location = filedialog.askdirectory(title="Choose download location")
+selected_directory = filedialog.askdirectory()
+if selected_directory:
+    os.chdir(selected_directory)
 
-# Download the selected audio or video stream
+if down_audio:
+    selected_astream = yt.streams.filter(only_audio=True).order_by('abr').desc().first()    
+    selected_astream.download(filename=selected_astream.default_filename.split('.')[0] + ' audio'+ selected_astream.default_filename[selected_astream.default_filename.rfind("."):])    
 
-audio.download(download_location, filename=audio.default_filename.split('.')[0] + ' audio'+ audio.default_filename[audio.default_filename.rfind("."):])
+t1 = threading.Thread(target=selected_stream.download)
+t1.start()
 
-if (download_type == "v"):
-    stream.download(download_location)
-
-print("Download complete.")
+while True:
+    if os.path.exists(selected_stream.default_filename):
+        file_size = os.path.getsize(selected_stream.default_filename)
+        print(f"{round(file_size / (1024 * 1024))} / {round(selected_stream.filesize / (1024 * 1024))} MB.", end='\r')
+        if file_size == selected_stream.filesize:
+            break
+    time.sleep(1)  
+t1.join()
+print("Download complete!")
