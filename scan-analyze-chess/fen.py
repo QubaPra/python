@@ -2,17 +2,20 @@ from PIL import ImageGrab
 import numpy as np
 import webbrowser
 from tensorflow import keras
+import time
 
 pieces = ["b","k","n", "p", "q", "r", "1","B","K", "N", "P", "Q", "R"]
 
 # Load the trained model
 model = keras.models.load_model('model.h5')
 
-# Get the image from the clipboard
 img = ImageGrab.grabclipboard()
 
-if img is None:
-    quit()
+while img is None:
+    # Get the image from the clipboard
+    print("Waiting for screenshot...",end="\r")
+    img = ImageGrab.grabclipboard()    
+    time.sleep(1)
 
 img = img.convert("RGB")
 
