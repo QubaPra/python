@@ -74,6 +74,13 @@ def check_for_end():
         draw_sound.play()
         return True
 
+def save_result(winner, moves):
+    with open("lastgame.txt", "w") as file:
+        if winner == "Draw":
+            file.write("Draw after " + str(len(moves)*2) + " moves")
+        else:
+            file.write(winner + " wins after " + str(len(moves)*2) + " moves")
+
 # Game Loop
 while not game_over:
     # Handle events
@@ -102,7 +109,7 @@ while not game_over:
                         player_move = False
                         player_last_move = (selected_piece_pos,(row, col))                       
                         if board.repetition(selected_piece_pos,row, col):
-                            winner = "Draw"
+                            winner = "Draw"                            
                             game_over = True                        
                         if piece[1] == "pawn" and (row==0 or row==7):
                             color="white"                        
@@ -162,8 +169,9 @@ while game_over:
                 quit()
 
     # Display winner
-    font = pygame.font.SysFont('Impact', 100)
-    if winner != "White" and winner != "Black":
+    font = pygame.font.SysFont('Impact', 100)    
+    save_result(winner, board.returnAllMoves())
+    if winner != "White" and winner != "Black":        
         text = font.render(f"{winner}", True, (128,128,128))
         text_rect = text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
 

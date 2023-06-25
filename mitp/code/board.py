@@ -362,3 +362,6 @@ class ChessBoard:
         allmoves.append((selected_piece_pos,(row,col)))
         if len(allmoves)>8:
             return (allmoves[-1]==allmoves[-5]==allmoves[-9] and allmoves[-2]==allmoves[-6])
+        
+    def returnAllMoves(self):
+        return allmoves

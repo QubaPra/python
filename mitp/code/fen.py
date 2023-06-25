@@ -14,7 +14,7 @@ img = ImageGrab.grabclipboard()
 
 while img is None:
     # Get the image from the clipboard
-    print("Waiting for screenshot...",end="\r")
+    print("Make screenshot with chessboard...",end="\r")
     img = ImageGrab.grabclipboard()    
     time.sleep(1)
 
