@@ -1,6 +1,9 @@
 # Chess
 
-Chess with all rules included. Game is made in PyGame.
+Chess with all rules included. Game is made in PyGame. I made few play modes:
+1. Player1 vs Player2
+2. Player vs Stockfish 15
+3. Screen position scan (AI pieces recognition in tensorflow)
 
 
 ### Installation
