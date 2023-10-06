@@ -11,6 +11,6 @@ To use this code, you'll need to install [Python](https://www.python.org/downloa
 
 ### Run
 
-Just open `main.py`.
+Just open `run.bat` and choose mode that you are interested at.
 
 >**Note:** You can change images of pieces in `img` folder
