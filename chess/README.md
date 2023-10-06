@@ -13,4 +13,4 @@ To use this code, you'll need to install [Python](https://www.python.org/downloa
 
 Just open `run.bat` and choose mode that you are interested at.
 
->**Note:** You can change images of pieces in `img` folder
+>**Note:** Whole code is in `code` folder
